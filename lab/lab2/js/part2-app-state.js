@@ -33,16 +33,22 @@
 ===================== */
 
 // Use the data source URL from lab 1 in this 'ajax' function:
-var downloadData = $.ajax("http://");
+var crimedata = $.ajax('https://raw.githubusercontent.com/CPLN-692-401/datasets/master/json/philadelphia-crime-snippet.json')
 
 // Write a function to prepare your data (clean it up, organize it as you like, create fields, etc)
-var parseData = function() {};
+var parseData = function(data) {return JSON.parse(data)};
 
 // Write a function to use your parsed data to create a bunch of marker objects (don't plot them!)
-var makeMarkers = function() {};
+var makeMarkers = function(parsed) {
+  return  _.map (parsed, function(dat) { return L.marker([dat.Lat , dat.Lng]);});
+};
 
 // Now we need a function that takes this collection of markers and puts them on the map
-var plotMarkers = function() {};
+var plotMarkers = function(markers) {
+  for(i=0;i<markers.length;i++) {
+    markers[i].addTo(map);
+  }
+};
 
 // At this point you should see a bunch of markers on your map.
 // Don't continue on until you can make them appear!
@@ -61,7 +67,11 @@ var plotMarkers = function() {};
 ===================== */
 
 // Look to the bottom of this file and try to reason about what this function should look like
-var removeMarkers = function() {};
+var removeMarkers = function(markers) {
+  for(i=0;i<markers.length;i++) {
+    map.removeLayer(markers[i]);
+  };
+};
 
 /* =====================
   Optional, stretch goal
@@ -70,7 +80,9 @@ var removeMarkers = function() {};
 
   Note: You can add or remove from the code at the bottom of this file for the stretch goal.
 ===================== */
-
+var filterMarkers = function(filtered) {
+  return  _.filter (filtered, function(dat) { return dat['General Crime Category']==='Narcotic / Drug Law Violations';});
+};
 /* =====================
  Leaflet setup - feel free to ignore this
 ===================== */
@@ -91,9 +103,13 @@ var Stamen_TonerLite = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/ton
  CODE EXECUTED HERE!
 ===================== */
 
-downloadData.done(function(data) {
+crimedata.done(function(data) {
   var parsed = parseData(data);
   var markers = makeMarkers(parsed);
+  console.log(markers);
   plotMarkers(markers);
   removeMarkers(markers);
+  var filtered = filterMarkers(parsed);
+  var newmarkers = makeMarkers(filtered);
+  plotMarkers(newmarkers);
 });
